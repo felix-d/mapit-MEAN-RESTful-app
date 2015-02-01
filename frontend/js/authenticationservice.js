@@ -20,7 +20,7 @@ angular.module('myApp.authenticationService', [])
 
                 /* Use this for real authentication
                  ----------------------------------------------*/
-                $http.post('http://localhost:3000/api/authenticate', {
+                $http.post('/api/authenticate', {
                         username: username,
                         password: password
                     })
@@ -31,7 +31,7 @@ angular.module('myApp.authenticationService', [])
 
             };
             service.SignUp = function(username, password, callback) {
-                $http.post('http://localhost:3000/api/users', {
+                $http.post('/api/users', {
                         username: username,
                         password: password
                     })
