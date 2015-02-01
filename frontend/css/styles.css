@@ -26,3 +26,7 @@
     font-weight:lighter;
     font-size: 4.6em;
 }
+.info-box {
+    overflow: visible;
+}
+
