@@ -1,10 +1,16 @@
-<h2>Panel</h2>
+<h2>MapIt! Panel</h2>
+<div class="alert alert-danger" ng-if="showErrorMessage">{{errorMessage}}</div>
+<div class="alert alert-info" ng-model="successMessage" ng-if="showSuccessMessage">{{successMessage}}</div>
 <form ng-submit="sendMessage()">
     <div class="form-group">
         <label for="inputMessage">Message</label>
-        <input type="text-area" id="inputMessage" ng-model="message" placeholder="Your message...">
+        <br/>
+        <textarea rows="4" id="inputMessage" ng-model="message" placeholder="Your message..." required></textarea>
     </div>
-         <button type="submit" class="btn btn-default">Submit</button>
+         <button type="submit" class="btn btn-default"id="submit-button">Submit</button>
 </form>
-<button class="btn btn-danger" ng-click="logout()">Log out</button>
+         <button class="btn btn-danger" id="delete-button" ng-show="showDeleteButton" ng-click="deleteMessage()">Delete</button>
+        
+         <br />
+<button class="btn btn-danger" id="logout-btn" ng-click="logout()">Log out</button>
         

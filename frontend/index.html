@@ -8,12 +8,19 @@
             .control-panel {height:600px;background-color: #CCC;padding: 20px;}
         </style>
         <link href="./bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+        <link href="./css/styles.css" type="text/css" rel="stylesheet">
         <script type="text/javascript"
                 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdIYLcSj7QQBxsiP4Cy0ChfpxnbdHK-4I"></script>
     </head>
     <body ng-app="myApp">
         <div class="container">
             <div class="row">
+                <div class="col-md-12 main-title text-center">
+                    <h1>MapIt!</h1>
+                </div>
+            </div>
+            <div class="row">
+
                 <div ng-controller="MyCtrl">
                     <div class="col-md-8"> 
                         <div id="map-canvas"></div>

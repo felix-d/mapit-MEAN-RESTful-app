@@ -3,51 +3,64 @@ angular.module('myApp.googleMapService', [])
 
         var googleMapService = {},
             lastMarker,
-            rawlocations = [];
-       
-        
-        //We get the locations from a get request to the server
-        rawlocations = [
-            [45.5, 73.5, "Bob", "allo je mappelle Bob"],
-            [45.56, 73.45, "Yolo", "wooow trop yolo serieux"],
-            [45.33, 45.12, "Cath", "wudup i am cath"]
-        ];
+            rawlocations = [],
+            currentSelectedLocation;
 
-        $http.get('api/locations').success(function(response){
-           console.log(JSON.stringify(response)); 
-        });
+        googleMapService.refreshLocations = function() {
+            rawlocations = [];
+            $http.get('api/locations').success(function(response) {
+                for (var i = 0, l = response.length; i < l; i++) {
+                    var r = response[i];
+                    rawlocations.push([parseFloat(r.latitude), parseFloat(r.longitude), r.username, r.message, r._id]);
+                }
+                initialize();
+                if (lastMarker) lastMarker.setMap(null);
+            }).error(function() {});
+        };
 
 
         //An object that will contain the google map latlong
         //and the google map infoWindow associated
-        function Location(latlon, message) {
+        function Location(latlon, message, username, id) {
             this.latlon = latlon;
             this.message = message;
+            this.username = username;
+            this.id = id;
         }
 
         //Convert the raw data into an array of Location Objects
         function getLocations(locations) {
             return locations.map(function(e, i) {
-                var contentString = '<div>' + e[2] + ' said:<br/>' + e[3] + '</div>';
+                var contentString = '<div><strong>' + e[2] + ' said:</strong><br/>' + e[3] + '</div>';
                 return new Location(
                     new google.maps.LatLng(e[0], e[1]),
                     new google.maps.InfoWindow({
                         content: contentString
-                    }));
+                    }),
+                    e[2],
+                    e[4]);
+
             });
         }
 
-        googleMapService.getLocation = function(){
+        googleMapService.getLocation = function() {
             return {
                 longitude: lastMarker.getPosition().lng(),
                 latitude: lastMarker.getPosition().lat()
             };
         };
+
+        googleMapService.isMarkerSet = function() {
+            if (lastMarker === undefined) return false;
+            else return true;
+        };
         //function to place marker when the user click
         function placeMarker(position, map) {
             var marker = new google.maps.Marker({
                 position: position,
-                map: map
+                animation: google.maps.Animation.BOUNCE,
+                map: map,
+                icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
             });
             googleMapService.clearMarker();
             lastMarker = marker;
@@ -65,63 +78,83 @@ angular.module('myApp.googleMapService', [])
             return latlngbounds;
         }
 
-        function addMarker() {
-            var latitude = lastMarker.position.lat();
-            var longitude = lastMarker.position.lon();
-
-            ////we get the content
-            //var message = theContent;
-
-            ////we post the new location
-            //$http
-
-            //we clear the lastMarker so it cannot be removed on success
-            lastMarker = undefined;
+        function clearMarkers(markers){
+            markers.forEach(function(m){
+                m.setMap(null);
+            });
+            console.log("cleaning");
+            return [];
         }
 
         function initialize() {
-
+                if (!arguments.callee.cache) arguments.callee.cache = {};
+                var cache = arguments.callee.cache;
+                if(cache.markers) cache.markers = clearMarkers(cache.markers);
+                else cache.markers = [];
                 var locations = getLocations(rawlocations);
+                if (cache.firstInit === undefined) {
+                    cache.firstInit = true;
+                    var mapOptions = {},
+                        bounds;
+                    if (rawlocations.length !== 0) {
+                        bounds = getBounds(locations);
 
-                //we get bounds
-                theBounds = getBounds(locations);
+                    } else {
+                        mapOptions.center = new google.maps.LatLng(45.5, -73.5667);
+                        mapOptions.zoom = 2;
+                    }
+                    //the new map
+                    cache.map = new google.maps.Map(document.getElementById('map-canvas'),
+                        mapOptions);
 
-
-                //we set map options
-                var mapOptions = {
-                    center: theBounds.getCenter()
-                };
-
-                //the new map
-                var map = new google.maps.Map(document.getElementById('map-canvas'),
-                    mapOptions);
-
-                //we fit bounds
-                map.fitBounds(theBounds);
-
+                    if (rawlocations.length !== 0) map.fitBounds(bounds);
+                }
                 //we add the markers to the map and set the listeners
                 locations.forEach(function(n, i) {
+                    function sameUser() {
+                        var username = $rootScope.getUsername();
+                        return username && n.username === username;
+                    }
+                    var icon =
+                        sameUser() ?
+                        'http://maps.google.com/mapfiles/ms/icons/blue-dot.png' :
+                        'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+
                     var marker = new google.maps.Marker({
                         position: n.latlon,
-                        map: map,
-                        title: "none"
+                        map: cache.map,
+                        title: "none",
+                        icon: icon
                     });
+                    cache.markers.push(marker);
+
                     google.maps.event.addListener(marker, 'click', function(e) {
-                        n.message.open(map, marker);
+                        if (sameUser()) $rootScope.$broadcast("allow");
+                        else $rootScope.$broadcast("disallow");
+                        googleMapService.clearMarker();
+                        currentSelectedLocation = n;
+                        n.message.open(cache.map, marker);
+                        $rootScope.$broadcast("hideAllMessages");
                     });
                 });
 
-                google.maps.event.addListener(map, 'click', function(e) {
-                    if ($rootScope.loggedIn()) placeMarker(e.latLng, map);
+                google.maps.event.addListener(cache.map, 'click', function(e) {
+                    $rootScope.$broadcast("disallow");
+                    $rootScope.$broadcast("hideAllMessages");
+                    if ($rootScope.loggedIn()) placeMarker(e.latLng, cache.map);
                 });
             }
             //we show the map
-        google.maps.event.addDomListener(window, 'load', initialize);
+        googleMapService.refreshLocations();
 
+        googleMapService.getSelectedLocation = function() {
+            return currentSelectedLocation;
+        };
         googleMapService.clearMarker = function() {
             if (lastMarker)
                 lastMarker.setMap(null);
         };
 
+        google.maps.event.addDomListener(window, 'load', initialize);
         return googleMapService;
     });

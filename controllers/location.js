@@ -9,10 +9,14 @@ var mongoose = require('../node_modules/mongoose');
 exports.postLocations = function(req, res) {
     // Create a new instance of the Location model
     var location = new Location();
-    console.log(req.body);
     // Set the location properties that came from the POST data
+    console.log(req.body.message);
+    console.log(req.body.latitude);
+    console.log(req.body.longitude);
+
     location.latitude = req.body.latitude;
     location.longitude = req.body.longitude;
+
     location.message = req.body.message;
 
     //passport will automatically set the user in req.user
@@ -40,8 +44,10 @@ exports.getLocations = function(req, res) {
     // Use the Location model to find all locations
     // from particular user with their username
     Location.find({}).lean().exec(function(err, locations) {
-        if(err)
+        if(err){
             res.send(err);
+            return;
+        }
 
         //We want to set the username on each location by looking
         //up the userId in the User documents.
@@ -69,6 +75,7 @@ exports.getLocations = function(req, res) {
                 if(counter === l ) {
                     //respond
                     res.json(locations);
+                    return;
                 }           
             };
         };
