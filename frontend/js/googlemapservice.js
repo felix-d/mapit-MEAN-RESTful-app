@@ -31,7 +31,7 @@ angular.module('myApp.googleMapService', [])
         //Convert the raw data into an array of Location Objects
         function getLocations(locations) {
             return locations.map(function(e, i) {
-                var contentString = '<div class="info-box"><h3>' + e[2] + ' said:</h3>' + e[3] + '</div>';
+                var contentString = '<div class="info-box"><h5>' + e[2] + ' said:</h5><p>' + e[3] + '</p></div>';
                 return new Location(
                     new google.maps.LatLng(e[0], e[1]),
                     new google.maps.InfoWindow({
