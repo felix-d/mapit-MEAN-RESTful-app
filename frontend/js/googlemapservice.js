@@ -1,5 +1,5 @@
 angular.module('myApp.googleMapService', [])
-    .factory('GoogleMapService', function($rootScope, $http) {
+    .factory('GoogleMapService', function($rootScope, $timeout, $http) {
 
         var googleMapService = {},
             lastMarker,
@@ -147,6 +147,8 @@ angular.module('myApp.googleMapService', [])
             }
             //we show the map
         googleMapService.refreshLocations();
+        $timeout(googleMapService.refreshLocations, 10000);
+            
 
         googleMapService.getSelectedLocation = function() {
             return currentSelectedLocation;
