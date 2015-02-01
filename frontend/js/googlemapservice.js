@@ -35,7 +35,8 @@ angular.module('myApp.googleMapService', [])
                 return new Location(
                     new google.maps.LatLng(e[0], e[1]),
                     new google.maps.InfoWindow({
-                        content: contentString
+                        content: contentString,
+                        maxWidth: 320
                     }),
                     e[2],
                     e[4]);
