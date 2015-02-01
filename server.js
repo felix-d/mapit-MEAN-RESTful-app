@@ -10,7 +10,7 @@ var userController = require('./controllers/user');
 var authController = require('./controllers/auth');
  
 // Connect to the mapit database
-mongoose.connect('mongodb://localhost:27017/mapit');
+mongoose.connect('mongodb://felix:mapitadmin@ds039411.mongolab.com:39411/heroku_app33632584');
 
 // Create our Express application
 var app = express();
