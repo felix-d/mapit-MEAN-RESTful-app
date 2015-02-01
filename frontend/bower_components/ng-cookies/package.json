@@ -1,0 +1,74 @@
+{
+  "name": "ng-cookies",
+  "version": "1.0.2",
+  "description": "Simple cookie service for AngularJS",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/roryf/ng-cookies.git"
+  },
+  "homepage": "https://github.com/roryf/ng-cookies",
+  "scripts": {
+    "test": "karma start karma.conf.js",
+    "compile": "browserify index.js -o dist/ng-cookies.js",
+    "minify": "uglifyjs dist/ng-cookies.js --screw-ie8 --mangle --compress warnings=false --output dist/ng-cookies.min.js",
+    "clean": "rm -rf dist",
+    "lint": "jshint --reporter node_modules/jshint-stylish/stylish.js index.js",
+    "build": "mkdir -p dist && npm run lint && npm run compile && npm run minify",
+    "version": "./bin/version.sh",
+    "release": "./bin/release.sh"
+  },
+  "keywords": [
+    "angular",
+    "angularjs",
+    "cookie",
+    "cookies"
+  ],
+  "author": "FanDuel, Inc.",
+  "contributors": [
+    {
+      "name": "Rory Fitzpatrick",
+      "email": "rory@fanduel.com"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "cookie": "^0.1.2"
+  },
+  "devDependencies": {
+    "angular": "^1.3.5",
+    "angular-mocks": "^1.3.5",
+    "browserify": "^6.3.4",
+    "browserify-ngannotate": "^0.4.0",
+    "browserify-shim": "^3.8.0",
+    "jasmine-core": "^2.1.3",
+    "jshint": "^2.5.10",
+    "jshint-stylish": "^1.0.0",
+    "karma": "^0.12.28",
+    "karma-browserify": "^1.0.0",
+    "karma-cli": "0.0.4",
+    "karma-jasmine": "^0.3.2",
+    "karma-mocha-reporter": "^0.3.1",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "semver": "^4.1.0",
+    "uglify-js": "^2.4.15"
+  },
+  "peerDependencies": {
+    "angular": "^1.3.5"
+  },
+  "browser": {
+    "angular": "./node_modules/angular/angular.min.js"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-shim",
+      "browserify-ngannotate"
+    ],
+    "exclude": [
+      "angular"
+    ]
+  },
+  "browserify-shim": {
+    "angular": "global:angular"
+  }
+}
