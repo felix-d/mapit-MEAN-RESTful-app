@@ -147,7 +147,7 @@ angular.module('myApp.googleMapService', [])
             }
             //we show the map
         googleMapService.refreshLocations();
-        $timeout(function(){googleMapService.refreshLocations();}, 10000);
+        // $timeout(function(){googleMapService.refreshLocations();}, 10000);
             
 
         googleMapService.getSelectedLocation = function() {
