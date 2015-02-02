@@ -10,7 +10,7 @@ var userController = require('./controllers/user');
 var authController = require('./controllers/auth');
  
 // Connect to the mapit database
-mongoose.connect('mongodb://felix:mapitadmin@ds039411.mongolab.com:39411/heroku_app33632584');
+mongoose.connect('mongodb://localhost:27017/mapit');
 
 // Create our Express application
 var app = express();
@@ -31,10 +31,9 @@ app.use(passport.initialize());
 // Create our Express router
 var router = express.Router();
 
-// app.get('/', function(req, res){
-//  res.sendfile('index.html', {root: __dirname + '/frontend/' });
-// });
+//change static folder
 app.use(express.static(__dirname + '/frontend/'));
+
 // Create endpoint handlers for /locations
 router.route('/locations')
   .post(authController.isAuthenticated, locationController.postLocations)
@@ -51,6 +50,7 @@ router.route('/users')
   .post(userController.postUsers)
   .get(authController.isAuthenticated, userController.getUsers);
 
+//Create endpoint handler for authenticating users
 router.route('/authenticate')
   .post(userController.authenticateUser);
 
@@ -58,5 +58,4 @@ router.route('/authenticate')
 app.use('/api', router);
 
 // Start the server
-
-app.listen(process.env.PORT || 5000);
+app.listen(process.env.PORT || 3000);

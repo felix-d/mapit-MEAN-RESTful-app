@@ -1,37 +1,68 @@
 'use strict';
-
+//THANKS TO http://jasonwatmore.com/post/2014/05/26/AngularJS-Basic-HTTP-Authentication-Example
+//For his authenticationservice
 angular.module('myApp.authenticationService', [])
-    .factory('AuthenticationService', ['Base64', '$http', '$cookieStore', '$rootScope', '$timeout', 'GoogleMapService',
+    .factory('AuthenticationService', [
+        'Base64',
+        '$http',
+        '$cookieStore',
+        '$rootScope',
+        '$timeout',
+        'GoogleMapService',
         function(Base64, $http, $cookieStore, $rootScope, $timeout, GoogleMapService) {
             var service = {};
 
+            //The login function
             service.Login = function(username, password, callback) {
 
-
-                /* Use this for real authentication
-                 ----------------------------------------------*/
                 $http.post('/api/authenticate', {
                         username: username,
                         password: password
                     })
                     .success(function(response) {
+
+                        //We refresh the locations to change
+                        //the color of our own markers to blue
+                        
                         GoogleMapService.refreshLocations();
+
                         callback(response);
                     });
 
             };
+
+            //The sign up function
             service.SignUp = function(username, password, callback) {
+
                 $http.post('/api/users', {
                         username: username,
                         password: password
                     })
                     .success(function(response) {
+
+                        //We refresh the locations to change
+                        //the color of our own markers to blue
+                        
                         GoogleMapService.refreshLocations();
+
                         callback(response);
-                    }).error(function(response) {
+                    })
+                    .error(function(response) {
                         callback(response);
                     });
+            };
 
+            //we add the loggedIn method to the $rootScope
+            $rootScope.loggedIn = function() {
+                if ($rootScope.globals && $rootScope.globals.currentUser)
+                    return true;
+                return false;
+            };
+
+            //we add the getUsername method to the $rootScope
+            $rootScope.getUsername = function() {
+                if ($rootScope.loggedIn())
+                    return $rootScope.globals.currentUser.username;
             };
 
             service.SetCredentials = function(username, password) {
@@ -56,16 +87,7 @@ angular.module('myApp.authenticationService', [])
                 $http.defaults.headers.common.Authorization = 'Basic ';
 
             };
-            //To avoid circular dependency
-            $rootScope.loggedIn = function() {
-                if ($rootScope.globals && $rootScope.globals.currentUser)
-                    return true;
-                return false;
-            };
-            $rootScope.getUsername = function() {
-                if ($rootScope.loggedIn())
-                    return $rootScope.globals.currentUser.username;
-            };
+
 
             return service;
         }

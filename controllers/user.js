@@ -2,6 +2,18 @@
 var User = require('../models/user');
 
 // **********************************
+// GET Users
+// **********************************
+// Create endpoint /api/users for GET
+exports.getUsers = function(req, res) {
+  User.find(function(err, users) {
+    if (err)
+      res.send(err);
+    res.json(users);
+  });
+};
+
+// **********************************
 // POST Users
 // **********************************
 // Create endpoint /api/users for POST
@@ -28,6 +40,7 @@ exports.postUsers = function(req, res) {
 // **********************************
 // Authenticate user
 // **********************************
+// Create endpoint /api/authenticate for POST
 exports.authenticateUser = function(req, res) {
     if(!req.body.username || !req.body.password){
         res.json({ message: 'Error processing the request' });
@@ -49,17 +62,5 @@ exports.authenticateUser = function(req, res) {
             }
         });
     });
-};
-
-// **********************************
-// GET Users
-// **********************************
-// Create endpoint /api/users for GET
-exports.getUsers = function(req, res) {
-  User.find(function(err, users) {
-    if (err)
-      res.send(err);
-    res.json(users);
-  });
 };
 

@@ -1,17 +1,30 @@
 var panelCtrl = angular.module('myApp.panelCtrl', []);
 panelCtrl.controller('PanelCtrl', function($scope, $rootScope, $location, $http, AuthenticationService, GoogleMapService) {
-    $scope.errorMessage = false;
+
+    //The scope logout function
     $scope.logout = function() {
+
+        //we clear the credentials from storage
         AuthenticationService.ClearCredentials();
+
+        //we relocate to login page
         $location.path('/');
     };
 
+    //Called when adding a message to the map
     $scope.sendMessage = function() {
+        
+        //we hide the error message if there was one
         $scope.showErrorMessage = false;
+
+        //We need to set a marker!
         if (!GoogleMapService.isMarkerSet()) {
             $scope.errorMessage = "Please set a marker first";
             $scope.showErrorMessage = true;
-        } else {
+        } 
+        else {
+
+            //we post to the api
             $http.post('/api/locations', {
                 message: $scope.message,
                 longitude: GoogleMapService.getLocation().longitude,
@@ -21,16 +34,17 @@ panelCtrl.controller('PanelCtrl', function($scope, $rootScope, $location, $http,
                 $scope.successMessage = "You mapped it!";
                 $scope.showSuccessMessage = true;
                 GoogleMapService.refreshLocations();
-
-            }).error(function(response) {
-                alert(response);
             });
-
         }
     };
 
+    //scope function to delete a marker
     $scope.deleteMessage = function() {
+
+        //we get the location object
         var csm = GoogleMapService.getSelectedLocation();
+
+        //we delete it using its id
         $http.delete('/api/locations/' + csm.id).success(function(){
             $scope.successMessage = "Deleted!";
             $scope.showSuccessMessage = true;
@@ -38,6 +52,7 @@ panelCtrl.controller('PanelCtrl', function($scope, $rootScope, $location, $http,
         });
     };
 
+    //listen for allow event
     $rootScope.$on('allow', function() {
         $scope.$apply(function(){
            $scope.showDeleteButton = true;
@@ -45,6 +60,7 @@ panelCtrl.controller('PanelCtrl', function($scope, $rootScope, $location, $http,
         });
     });
 
+    //listen for disallow event
     $rootScope.$on('disallow', function(){
         $scope.$apply(function(){
            $scope.showDeleteButton = false;
@@ -52,6 +68,8 @@ panelCtrl.controller('PanelCtrl', function($scope, $rootScope, $location, $http,
         });
         
     });
+
+    //listen for hideAllMessages event
     $rootScope.$on('hideAllMessages', function(){
         $scope.$apply(function(){
            $scope.showErrorMessage = false;
