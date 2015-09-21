@@ -84,7 +84,7 @@ angular.module('myApp.googleMapService', [])
          **************************/
         function responseToLocations(response) {
 
-            var locations;
+            var locations = [];
 
             //We push into our locations array
             for (var i = 0, l = response.length; i < l; i++) {
